@@ -22,8 +22,8 @@ A Minimax agent that plays Connect4
   
     - __Windows__: 
     ```bash
-    conda create --name sliding python=3.6 
-    activate sliding
+    conda create --name connect4 python=3.6 
+    activate connect4
     conda install numpy
     conda install matplotlib
     conda install jupyter notebook
