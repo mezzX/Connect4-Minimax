@@ -15,8 +15,8 @@ class Connect4:
  
         self.score = None
         self.state = np.zeros(size, dtype = np.float)
-        self.openCells = [0]*7
-        self.available_moves = [0, 1, 2, 3, 4, 5, 6]
+        self.openCells = [0]*self.w
+        self.available_moves = list(range(self.w))  # array of possible moves.
         self.player = 1
         self.last_move = None
         self.n_moves = 0
