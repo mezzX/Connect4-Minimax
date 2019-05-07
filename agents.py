@@ -6,7 +6,7 @@ class SearchTimeout(Exception):
     pass
 
 class MinimaxPlayer:
-    def __init__(self, search_depth=3, score_cls=Heuristic(), timeout=10.):
+    def __init__(self, search_depth=3, score_cls=Heuristic(), timeout=20.):
         '''
         Game-playing agent that chooses a move using minimax search. 
         You must finish and test this player to make sure it properly uses
@@ -57,17 +57,20 @@ class MinimaxPlayer:
 
         self.time_left = time_left
         best_move = -1
+        depth = 1
 
-        try:
-            return self.minimax(game, self.search_depth)
+        while True:
+            try:
+                best_move = self.minimax(game, depth)
+                depth += 1
 
-        except SearchTimeout:
-            print('timeout')
-            pass
+            except SearchTimeout:
+                break
 
+        print(depth)
         return best_move
 
-    def minimax(self, game, depth):
+    def minimax(self, game, depth, alpha=float('-inf'), beta=float('inf')):
         '''
         Implement minimax search algorithm as described in the lectures.
 
@@ -87,6 +90,12 @@ class MinimaxPlayer:
             depth : int
                 Depth is an integer representing the maximum number of plies to
                 search in the game tree before aborting
+
+            alpha : float
+                Alpha limits the lower bound of search on minimizing layers
+
+            beta : float
+                Beta limits the upper bound of search on maximizing layers
 
             Returns
              -------
@@ -108,7 +117,7 @@ class MinimaxPlayer:
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        return self.minimax_search(game, depth)
+        return self.minimax_search(game, depth, alpha, beta)
 
     def terminal_state(self, game):
         '''
@@ -122,7 +131,7 @@ class MinimaxPlayer:
 
         return not game.available_moves
 
-    def min_value(self, game, depth):
+    def min_value(self, game, depth, alpha, beta):
         '''
         Finds the lowest utility among all the posible actions from the given board
 
@@ -134,6 +143,12 @@ class MinimaxPlayer:
         depth : int
             Depth is an integer representing the maximum number of plies to
             search in the game tree before aborting
+
+        alpha : float
+            Alpha limits the lower bound of search on minimizing layers
+
+        beta : float
+            Beta limits the upper bound of search on maximizing layers
 
         Returns
         -------
@@ -153,10 +168,13 @@ class MinimaxPlayer:
         util = float('inf')
         actions = random.sample(game.available_moves, len(game.available_moves))
         for action in actions:
-            util = min(util, self.max_value(game.sim_move(action), depth-1))
+            util = min(util, self.max_value(game.sim_move(action), depth-1, alpha, beta))
+            if util <= alpha:
+                return util
+            beta = min(beta, util)
         return util
 
-    def max_value(self, game, depth):
+    def max_value(self, game, depth, alpha, beta):
         '''
         Finds the highest utility among all the posible actions from the given board
 
@@ -168,6 +186,12 @@ class MinimaxPlayer:
         depth : int
             Depth is an integer representing the maximum number of plies to
             search in the game tree before aborting
+
+        alpha : float
+            Alpha limits the lower bound of search on minimizing layers
+
+        beta : float
+            Beta limits the upper bound of search on maximizing layers
 
         Returns
         -------
@@ -187,10 +211,13 @@ class MinimaxPlayer:
         util = float('-inf')
         actions = random.sample(game.available_moves, len(game.available_moves))
         for action in actions:
-            util = max(util, self.min_value(game.sim_move(action), depth-1))
+            util = max(util, self.min_value(game.sim_move(action), depth-1, alpha, beta))
+            if util >= beta:
+                return util
+            alpha = max(alpha, util)
         return util
 
-    def minimax_search(self, game, depth):
+    def minimax_search(self, game, depth, alpha, beta):
         '''
         Finds the best action among all the posible actions from the given board
 
@@ -211,5 +238,13 @@ class MinimaxPlayer:
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        return max(random.sample(game.available_moves, len(game.available_moves)),
-                    key=lambda m: self.min_value(game.sim_move(m), depth-1))
+        best_score = float('-inf')
+        best_move = -1
+        actions = random.sample(game.available_moves, len(game.available_moves))
+        for action in actions:
+            util = self.min_value(game.sim_move(action), depth-1, alpha, beta)
+            if util > best_score:
+                best_score = util
+                best_move = action
+            alpha = max(alpha, util)
+        return best_move

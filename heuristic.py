@@ -32,7 +32,7 @@ class Heuristic:
 
         own_moves = self.calc_score(player)
         opp_moves = self.calc_score(player * -1)
-        return(float(1.5 * own_moves - opp_moves))
+        return(float(own_moves - 3 * opp_moves))
 
     def find_pieces(self, player):
         '''
@@ -71,28 +71,28 @@ class Heuristic:
             y = piece[1]
 
         # checking rows from left to right.
-        if x + 3 < self.w:
-            if self.board[x + 1][y] == player:
-                if self.board[x + 2][y] == 0:
-                    score += 1
-                elif self.board[x + 2][y] == player:
-                    if x - 1 > 0:
-                        if self.board[x - 1][y] == 0 and self.board[x + 3][y] == 0:
-                            return float("inf")
-                    elif self.board[x + 3][y] == 0:
+            if x + 3 < self.w:
+                if self.board[x + 1][y] == player:
+                    if self.board[x + 2][y] == 0:
                         score += 1
+                    elif self.board[x + 2][y] == player:
+                        if x - 1 > 0:
+                            if self.board[x - 1][y] == 0 and self.board[x + 3][y] == 0:
+                                return float("inf")
+                        elif self.board[x + 3][y] == 0:
+                            score += 10
 
         # checking rows from right to left
-        if x - 3 > 0:
-            if self.board[x - 1][y] == player:
-                if self.board[x - 2][y] == 0:
-                    score += 1
-                elif self.board[x - 2][y] == player:
-                    if x + 1 < self.w:
-                        if self.board[x + 1][y] == 0 and self.board[x - 3][y] == 0:
-                            return float("inf")
-                    elif self.board[x - 3][y] == 0:
+            if x - 3 > 0:
+                if self.board[x - 1][y] == player:
+                    if self.board[x - 2][y] == 0:
                         score += 1
+                    elif self.board[x - 2][y] == player:
+                        if x + 1 < self.w:
+                            if self.board[x + 1][y] == 0 and self.board[x - 3][y] == 0:
+                                return float("inf")
+                        elif self.board[x - 3][y] == 0:
+                            score += 10
         return score
 
     def score_cols(self, player):
@@ -121,7 +121,7 @@ class Heuristic:
                     if self.board[x][y + 2] == 0:
                         score += 1
                     elif self.board[x][y + 2] == 1 and self.board[x][y + 3] == 0:
-                        score += 1
+                        score += 10
         return score
 
     def score_diag(self, player):
@@ -151,14 +151,14 @@ class Heuristic:
                     if self.board[x + 2][y + 2] == 0:
                         score += 1
                     elif self.board[x + 2][y + 2] == player and self.board[x + 3][y + 3] == 0:
-                        score += 1
+                        score += 10
 
                 # checking diagonals of negative slope.
                 elif self.board[x - 1][y + 1] == player:
                     if self.board[x - 2][y + 2] == 0:
                         score += 1
                     elif self.board[x - 2][y + 2] == player and self.board[x - 3][y + 3] == 0:
-                        score += 1
+                        score += 10
         return score
 
     def calc_score(self, player):

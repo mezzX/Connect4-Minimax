@@ -3,7 +3,7 @@ import numpy as np
 import timeit
 from copy import copy
 
-TIME_LIMIT_MILLIS = 150.
+TIME_LIMIT_MILLIS = 250.
 
 class Play:
     
